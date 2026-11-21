@@ -1,0 +1,26 @@
+[
+  {
+    "id": "member-1",
+    "name": "John Raj",
+    "role": "Founder & CEO",
+    "department": "Leadership",
+    "photo": "/assets/aistudio/passport_size_photo_5802c794.jpg",
+    "linkedin": "https://www.linkedin.com/in/john-raj/"
+  },
+  {
+    "id": "member-2",
+    "name": "Team Member Two",
+    "role": "Lead Full-Stack Engineer",
+    "department": "Engineering",
+    "photo": "",
+    "linkedin": "https://www.linkedin.com/"
+  },
+  {
+    "id": "member-3",
+    "name": "Team Member Three",
+    "role": "Product Designer & UI/UX Lead",
+    "department": "Design",
+    "photo": "",
+    "linkedin": "https://www.linkedin.com/"
+  }
+]
