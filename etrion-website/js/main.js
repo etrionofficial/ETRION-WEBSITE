@@ -87,13 +87,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Team roster display (managed from backend data/team.json)
+  const teamSlider = document.getElementById("teamSlider");
+  const teamViewport = document.getElementById("teamViewport");
   const teamGrid = document.getElementById("teamGrid");
   const teamEmpty = document.getElementById("teamEmpty");
   const teamToolbar = document.getElementById("teamToolbar");
   const teamFilters = document.getElementById("teamFilters");
+  const teamPrevBtn = document.getElementById("teamPrevBtn");
+  const teamNextBtn = document.getElementById("teamNextBtn");
+  const teamSliderControls = document.getElementById("teamSliderControls");
+  const teamDots = document.getElementById("teamDots");
 
   let teamMembers = [];
   let activeDept = "All";
+  let currentPage = 0;
+  let totalPages = 1;
+  let currentPerPage = 3;
+
+  const getCardsPerPage = () => {
+    if (window.innerWidth <= 600) return 1;
+    if (window.innerWidth <= 1100) return 2;
+    return 3;
+  };
 
   const getInitials = (name) => {
     const parts = (name || "").trim().split(/\s+/).filter(Boolean);
@@ -144,17 +159,93 @@ document.addEventListener("DOMContentLoaded", () => {
     return svg;
   };
 
+  const buildMemberCard = (member) => {
+    const hasLinkedin = isSafeHttpUrl(member.linkedin);
+    const card = document.createElement(hasLinkedin ? "a" : "article");
+    card.className = hasLinkedin ? "team-card team-card-link" : "team-card";
+
+    if (hasLinkedin) {
+      card.href = member.linkedin;
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.setAttribute("aria-label", `Contact ${member.name || "team member"} on LinkedIn`);
+    }
+
+    const photoBox = document.createElement("div");
+    photoBox.className = "team-photo";
+    const initialsSpan = document.createElement("span");
+    initialsSpan.textContent = getInitials(member.name);
+
+    if (isSafeImageSrc(member.photo)) {
+      const img = document.createElement("img");
+      img.src = member.photo;
+      img.alt = member.name || "Team member";
+      img.referrerPolicy = "no-referrer";
+      img.addEventListener("error", () => {
+        img.remove();
+        photoBox.appendChild(initialsSpan);
+      });
+      photoBox.appendChild(img);
+    } else {
+      photoBox.appendChild(initialsSpan);
+    }
+
+    const infoBox = document.createElement("div");
+    infoBox.className = "team-info-box";
+
+    const identity = document.createElement("div");
+    identity.className = "team-identity";
+
+    const nameEl = document.createElement("h3");
+    nameEl.className = "team-name";
+    nameEl.textContent = member.name || "";
+
+    const roleEl = document.createElement("p");
+    roleEl.className = "team-role";
+    roleEl.textContent = member.role || "";
+
+    identity.append(nameEl, roleEl);
+
+    const linkedinBadge = document.createElement("span");
+    linkedinBadge.className = hasLinkedin
+      ? "team-linkedin-btn"
+      : "team-linkedin-btn inactive";
+    linkedinBadge.setAttribute("aria-hidden", "true");
+    linkedinBadge.appendChild(createLinkedInIcon());
+
+    infoBox.append(identity, linkedinBadge);
+    card.append(photoBox, infoBox);
+    return card;
+  };
+
+  const updateSliderUI = () => {
+    currentPage = Math.max(0, Math.min(currentPage, totalPages - 1));
+    teamGrid.style.transform = `translateX(-${currentPage * 100}%)`;
+    teamPrevBtn.disabled = currentPage <= 0;
+    teamNextBtn.disabled = currentPage >= totalPages - 1;
+
+    teamDots.querySelectorAll(".team-dot").forEach((dot, idx) => {
+      const isActive = idx === currentPage;
+      dot.classList.toggle("active", isActive);
+      dot.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+  };
+
   const renderTeam = () => {
     teamGrid.innerHTML = "";
     teamFilters.innerHTML = "";
+    teamDots.innerHTML = "";
 
     if (!teamMembers.length) {
       teamToolbar.hidden = true;
+      teamSlider.hidden = true;
       teamEmpty.hidden = false;
       return;
     }
 
     teamEmpty.hidden = true;
+    teamSlider.hidden = false;
+
     const depts = ["All", ...new Set(teamMembers.map((m) => m.department || "Engineering"))];
     if (!depts.includes(activeDept)) activeDept = "All";
 
@@ -169,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.textContent = dept;
         btn.addEventListener("click", () => {
           activeDept = dept;
+          currentPage = 0;
           renderTeam();
         });
         teamFilters.appendChild(btn);
@@ -182,65 +274,85 @@ document.addEventListener("DOMContentLoaded", () => {
         ? teamMembers
         : teamMembers.filter((m) => (m.department || "Engineering") === activeDept);
 
-    filtered.forEach((member) => {
-      const hasLinkedin = isSafeHttpUrl(member.linkedin);
-      const card = document.createElement(hasLinkedin ? "a" : "article");
-      card.className = hasLinkedin ? "team-card team-card-link" : "team-card";
+    currentPerPage = getCardsPerPage();
+    totalPages = Math.max(1, Math.ceil(filtered.length / currentPerPage));
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
 
-      if (hasLinkedin) {
-        card.href = member.linkedin;
-        card.target = "_blank";
-        card.rel = "noopener noreferrer";
-        card.setAttribute("aria-label", `Contact ${member.name || "team member"} on LinkedIn`);
-      }
+    for (let i = 0; i < filtered.length; i += currentPerPage) {
+      const slide = document.createElement("div");
+      slide.className = "team-slide";
+      filtered.slice(i, i + currentPerPage).forEach((member) => {
+        slide.appendChild(buildMemberCard(member));
+      });
+      teamGrid.appendChild(slide);
+    }
 
-      const photoBox = document.createElement("div");
-      photoBox.className = "team-photo";
-      const initialsSpan = document.createElement("span");
-      initialsSpan.textContent = getInitials(member.name);
-
-      if (isSafeImageSrc(member.photo)) {
-        const img = document.createElement("img");
-        img.src = member.photo;
-        img.alt = member.name || "Team member";
-        img.referrerPolicy = "no-referrer";
-        img.addEventListener("error", () => {
-          img.remove();
-          photoBox.appendChild(initialsSpan);
+    if (totalPages > 1) {
+      teamSliderControls.hidden = false;
+      for (let p = 0; p < totalPages; p += 1) {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "team-dot";
+        dot.setAttribute("role", "tab");
+        dot.setAttribute("aria-label", `Show team page ${p + 1}`);
+        dot.addEventListener("click", () => {
+          currentPage = p;
+          updateSliderUI();
         });
-        photoBox.appendChild(img);
-      } else {
-        photoBox.appendChild(initialsSpan);
+        teamDots.appendChild(dot);
       }
+    } else {
+      teamSliderControls.hidden = true;
+    }
 
-      const infoBox = document.createElement("div");
-      infoBox.className = "team-info-box";
-
-      const identity = document.createElement("div");
-      identity.className = "team-identity";
-
-      const nameEl = document.createElement("h3");
-      nameEl.className = "team-name";
-      nameEl.textContent = member.name || "";
-
-      const roleEl = document.createElement("p");
-      roleEl.className = "team-role";
-      roleEl.textContent = member.role || "";
-
-      identity.append(nameEl, roleEl);
-
-      const linkedinBadge = document.createElement("span");
-      linkedinBadge.className = hasLinkedin
-        ? "team-linkedin-btn"
-        : "team-linkedin-btn inactive";
-      linkedinBadge.setAttribute("aria-hidden", "true");
-      linkedinBadge.appendChild(createLinkedInIcon());
-
-      infoBox.append(identity, linkedinBadge);
-      card.append(photoBox, infoBox);
-      teamGrid.appendChild(card);
-    });
+    updateSliderUI();
   };
+
+  teamPrevBtn.addEventListener("click", () => {
+    if (currentPage > 0) {
+      currentPage -= 1;
+      updateSliderUI();
+    }
+  });
+
+  teamNextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages - 1) {
+      currentPage += 1;
+      updateSliderUI();
+    }
+  });
+
+  let touchStartX = 0;
+  teamViewport.addEventListener(
+    "touchstart",
+    (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+    },
+    { passive: true }
+  );
+  teamViewport.addEventListener(
+    "touchend",
+    (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 45) {
+        if (dx < 0 && currentPage < totalPages - 1) {
+          currentPage += 1;
+          updateSliderUI();
+        } else if (dx > 0 && currentPage > 0) {
+          currentPage -= 1;
+          updateSliderUI();
+        }
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("resize", () => {
+    const nextPerPage = getCardsPerPage();
+    if (nextPerPage !== currentPerPage && teamMembers.length) {
+      renderTeam();
+    }
+  });
 
   const loadTeam = async () => {
     try {

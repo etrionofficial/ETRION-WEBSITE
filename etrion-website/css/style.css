@@ -190,7 +190,22 @@ p + p { margin-top: 1rem; }
 .filter-btn:hover { color: var(--ink); }
 .filter-btn.active { background: var(--navy-700); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(7, 22, 52, .12); }
 
-.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.team-slider { display: flex; flex-direction: column; gap: 1.5rem; }
+.team-slider-stage { display: flex; align-items: center; gap: 1rem; }
+.team-viewport { flex: 1; min-width: 0; overflow: hidden; }
+.team-track { display: flex; transition: transform .45s cubic-bezier(.16, 1, .3, 1); will-change: transform; }
+.team-slide { flex: 0 0 100%; min-width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; padding: 4px 2px 14px; }
+
+.team-arrow { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--ink); display: grid; place-items: center; flex-shrink: 0; cursor: pointer; box-shadow: 0 6px 18px rgba(7, 22, 52, .08); transition: transform .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease, opacity .2s ease; }
+.team-arrow:hover:not(:disabled) { background: var(--blue); border-color: var(--blue); color: #fff; transform: translateY(-1px); }
+.team-arrow:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+
+.team-slider-controls { display: flex; justify-content: center; align-items: center; }
+.team-dots { display: inline-flex; align-items: center; gap: .5rem; }
+.team-dot { width: 10px; height: 10px; border-radius: 999px; border: 0; padding: 0; background: #cbd5e6; cursor: pointer; transition: width .25s ease, background-color .25s ease; }
+.team-dot:hover { background: var(--blue-light); }
+.team-dot.active { width: 28px; background: var(--blue); }
+
 .team-card { display: flex; flex-direction: column; gap: .85rem; text-decoration: none; color: inherit; }
 .team-photo { position: relative; aspect-ratio: 1 / 1.06; width: 100%; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; background: linear-gradient(145deg, var(--navy-800), var(--navy-600) 60%, var(--blue)); color: #fff; display: grid; place-items: center; font-family: var(--font-head); font-size: 2.5rem; letter-spacing: 2px; box-shadow: 0 8px 24px rgba(7, 22, 52, .08); }
 .team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
@@ -210,7 +225,9 @@ p + p { margin-top: 1rem; }
 
 .btn:focus-visible,
 .filter-btn:focus-visible,
-.team-card-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 16px; }
+.team-arrow:focus-visible,
+.team-dot:focus-visible,
+.team-card-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
 /* ===== CTA ===== */
 .cta-band { background: linear-gradient(120deg, var(--navy-700), var(--blue)); padding: 70px 0; position: relative; overflow: hidden; }
@@ -255,12 +272,12 @@ p + p { margin-top: 1rem; }
 /* ===== Reveal animation ===== */
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s ease, transform .8s ease; }
 .reveal.visible { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } .gear, .float-card { animation: none; } html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } .gear, .float-card { animation: none; } .team-track { transition: none; } html { scroll-behavior: auto; } }
 
 /* ===== Responsive ===== */
 @media (max-width: 1100px) {
   .cards-grid { grid-template-columns: repeat(2, 1fr); }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-slide { grid-template-columns: repeat(2, 1fr); }
   .industries { grid-template-columns: repeat(4, 1fr); }
   .process { grid-template-columns: repeat(3, 1fr); row-gap: 2.5rem; }
   .process::before { display: none; }
@@ -282,7 +299,9 @@ p + p { margin-top: 1rem; }
   .cta-inner { flex-direction: column; text-align: center; }
 }
 @media (max-width: 600px) {
-  .cards-grid, .mv-grid, .contact-form .row, .team-grid { grid-template-columns: 1fr; }
+  .cards-grid, .mv-grid, .contact-form .row, .team-slide { grid-template-columns: 1fr; }
+  .team-slider-stage { flex-wrap: wrap; justify-content: center; gap: .75rem 1rem; }
+  .team-viewport { order: -1; flex: 0 0 100%; }
   .process { grid-template-columns: 1fr 1fr; }
   .industries { grid-template-columns: repeat(2, 1fr); }
   .footer-grid { grid-template-columns: 1fr; }

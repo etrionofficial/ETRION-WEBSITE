@@ -221,7 +221,25 @@
         <div class="team-filters" id="teamFilters" role="tablist" aria-label="Filter team by department"></div>
       </div>
 
-      <div class="team-grid" id="teamGrid" aria-live="polite"></div>
+      <div class="team-slider" id="teamSlider" hidden>
+        <div class="team-slider-stage">
+          <button type="button" class="team-arrow team-arrow-prev" id="teamPrevBtn" aria-label="Previous team members">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          <div class="team-viewport" id="teamViewport">
+            <div class="team-track" id="teamGrid" aria-live="polite"></div>
+          </div>
+
+          <button type="button" class="team-arrow team-arrow-next" id="teamNextBtn" aria-label="Next team members">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="team-slider-controls" id="teamSliderControls" hidden>
+          <div class="team-dots" id="teamDots" role="tablist" aria-label="Team pages"></div>
+        </div>
+      </div>
 
       <div class="team-empty" id="teamEmpty" hidden>
         <p>Team profiles are currently being updated.</p>

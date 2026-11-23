@@ -9,17 +9,41 @@
   },
   {
     "id": "member-2",
-    "name": "Team Member Two",
-    "role": "Lead Full-Stack Engineer",
-    "department": "Engineering",
-    "photo": "",
-    "linkedin": "https://www.linkedin.com/"
+    "name": "Harini S",
+    "role": "Co-Owner & COO",
+    "department": "Leadership",
+    "photo": "/assets/aistudio/WhatsApp_Image_2026-11-23_at_12.10.30_PM_2f73c899.jpeg",
+    "linkedin": "https://www.linkedin.com/in/harini-sankar13"
   },
   {
     "id": "member-3",
     "name": "Team Member Three",
     "role": "Product Designer & UI/UX Lead",
     "department": "Design",
+    "photo": "",
+    "linkedin": "https://www.linkedin.com/"
+  },
+  {
+    "id": "member-4",
+    "name": "Team Member Four",
+    "role": "Lead Full-Stack Engineer",
+    "department": "Engineering",
+    "photo": "",
+    "linkedin": "https://www.linkedin.com/"
+  },
+  {
+    "id": "member-5",
+    "name": "Team Member Five",
+    "role": "Cloud & DevOps Architect",
+    "department": "Cloud & AI",
+    "photo": "",
+    "linkedin": "https://www.linkedin.com/"
+  },
+  {
+    "id": "member-6",
+    "name": "Team Member Six",
+    "role": "AI & ML Engineer",
+    "department": "Cloud & AI",
     "photo": "",
     "linkedin": "https://www.linkedin.com/"
   }
